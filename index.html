@@ -331,6 +331,7 @@
                 <button class="operation-btn" onclick="setOperation('+')">Addition (+)</button>
                 <button class="operation-btn" onclick="setOperation('-')">Subtraction (−)</button>
                 <button class="start-btn" onclick="startSolving()">Let's Solve This! 🚀</button>
+                <button class="operation-btn" onclick="loadNextChallenge()">Next Challenge 📚</button>
                 <button class="clear-btn" onclick="clearAll()">Clear</button>
             </div>
         </div>
@@ -390,10 +391,71 @@
         let currentOperation = '+';
         let currentStep = 0;
         let problemData = {};
+        let currentChallengeIndex = 0;
+        
+        const challenges = [
+            { num1: 3, den1: 4, num2: 1, den2: 6, op: '+', title: "Adding fractions with different denominators" },
+            { num1: 5, den1: 8, num2: 3, den2: 8, op: '+', title: "Adding fractions with same denominators" },
+            { num1: 7, den1: 10, num2: 2, den2: 5, op: '-', title: "Subtracting fractions with different denominators" },
+            { num1: 2, den1: 3, num2: 1, den2: 4, op: '+', title: "Adding fractions that need simplifying" },
+            { num1: 5, den1: 6, num2: 1, den2: 3, op: '-', title: "Subtracting fractions with different denominators" },
+            { num1: 3, den1: 5, num2: 2, den2: 15, op: '+', title: "Adding when one denominator divides the other" },
+            { num1: 4, den1: 9, num2: 1, den2: 6, op: '+', title: "Adding fractions with larger LCM" },
+            { num1: 7, den1: 12, num2: 5, den2: 12, op: '-', title: "Subtracting fractions with same denominators" },
+            { num1: 1, den1: 2, num2: 1, den2: 3, op: '+', title: "Adding simple unit fractions" },
+            { num1: 3, den1: 8, num2: 1, den2: 4, op: '+', title: "Adding fractions where one simplifies the other" }
+        ];
         
         function setOperation(op) {
             currentOperation = op;
             document.getElementById('operator').textContent = op === '+' ? '+' : '−';
+        }
+        
+        function loadNextChallenge() {
+            const challenge = challenges[currentChallengeIndex];
+            document.getElementById('num1').value = challenge.num1;
+            document.getElementById('den1').value = challenge.den1;
+            document.getElementById('num2').value = challenge.num2;
+            document.getElementById('den2').value = challenge.den2;
+            setOperation(challenge.op);
+            
+            // Show challenge info
+            showChallengeInfo(currentChallengeIndex + 1, challenge.title);
+            
+            currentChallengeIndex = (currentChallengeIndex + 1) % challenges.length;
+            
+            // Clear any previous work
+            clearSteps();
+        }
+        
+        function showChallengeInfo(challengeNum, title) {
+            // Create a temporary info display
+            const infoDiv = document.createElement('div');
+            infoDiv.style.cssText = `
+                background: linear-gradient(135deg, #9f7aea, #805ad5);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                text-align: center;
+                margin: 20px 0;
+                animation: bounce 0.5s ease;
+            `;
+            infoDiv.innerHTML = `
+                <h3 style="margin: 0; font-size: 1.4rem;">📚 Challenge ${challengeNum}</h3>
+                <p style="margin: 10px 0 0 0; font-size: 1.1rem;">${title}</p>
+                <p style="margin: 10px 0 0 0; font-size: 0.9rem; opacity: 0.9;">Click "Let's Solve This!" when you're ready</p>
+            `;
+            
+            // Insert after input section
+            const inputSection = document.querySelector('.input-section');
+            inputSection.parentNode.insertBefore(infoDiv, inputSection.nextSibling);
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                if (infoDiv.parentNode) {
+                    infoDiv.parentNode.removeChild(infoDiv);
+                }
+            }, 4000);
         }
         
         function gcd(a, b) {
@@ -815,9 +877,19 @@
                             <span class="den" style="background: #ffd700; color: #2d3748;">${finalDen}</span>
                         </span>
                     </div>
-                    <button class="start-btn" onclick="clearAll()" style="margin-top: 20px;">Try Another Problem! 🚀</button>
+                    <button class="start-btn" onclick="loadNextChallenge()" style="margin-top: 20px;">Next Challenge! 🚀</button>
+                    <button class="operation-btn" onclick="clearAll()" style="margin-top: 20px;">Create My Own Problem ✏️</button>
                 </div>
             `;
+        }
+        
+        function clearSteps() {
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            document.getElementById('finalAnswer').innerHTML = '';
+            currentStep = 0;
+            problemData = {};
         }
         
         function clearAll() {
@@ -825,15 +897,8 @@
             document.getElementById('den1').value = '';
             document.getElementById('num2').value = '';
             document.getElementById('den2').value = '';
-            
-            for (let i = 1; i <= 6; i++) {
-                document.getElementById(`step${i}`).classList.remove('active');
-            }
-            
-            document.getElementById('finalAnswer').innerHTML = '';
-            currentStep = 0;
-            problemData = {};
+            clearSteps();
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979099240749d9a8',t:'MTc1Njg1Mzc2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9790e731300b1c5e',t:'MTc1Njg1Njk1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
